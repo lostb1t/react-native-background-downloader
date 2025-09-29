@@ -4,6 +4,15 @@ import NativeRNBackgroundDownloader from './NativeRNBackgroundDownloader'
 import { DownloadOptions } from './index.d'
 
 const { RNBackgroundDownloader } = NativeModules
+
+// Define safe constants for task states with fallback values
+// These match the native implementation constants
+const TASK_STATES = {
+  TaskRunning: RNBackgroundDownloader?.TaskRunning ?? 0,
+  TaskSuspended: RNBackgroundDownloader?.TaskSuspended ?? 1,
+  TaskCanceling: RNBackgroundDownloader?.TaskCanceling ?? 2,
+  TaskCompleted: RNBackgroundDownloader?.TaskCompleted ?? 3,
+}
 // Use the same architecture-aware native module for event emitter as for method calls
 // This ensures compatibility with both Old Architecture (Bridge) and New Architecture (TurboModules)
 let RNBackgroundDownloaderEmitter
@@ -123,14 +132,14 @@ export async function checkForExistingDownloads () {
       const task = new DownloadTask(taskInfo, tasksMap.get(taskInfo.id))
       log('[RNBackgroundDownloader] checkForExistingDownloads-3', taskInfo)
 
-      if (taskInfo.state === RNBackgroundDownloader.TaskRunning) {
+      if (taskInfo.state === TASK_STATES.TaskRunning) {
         task.state = 'DOWNLOADING'
-      } else if (taskInfo.state === RNBackgroundDownloader.TaskSuspended) {
+      } else if (taskInfo.state === TASK_STATES.TaskSuspended) {
         task.state = 'PAUSED'
-      } else if (taskInfo.state === RNBackgroundDownloader.TaskCanceling) {
+      } else if (taskInfo.state === TASK_STATES.TaskCanceling) {
         task.stop()
         return null
-      } else if (taskInfo.state === RNBackgroundDownloader.TaskCompleted) {
+      } else if (taskInfo.state === TASK_STATES.TaskCompleted) {
         if (taskInfo.bytesDownloaded === taskInfo.bytesTotal)
           task.state = 'DONE'
         else
