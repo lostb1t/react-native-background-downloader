@@ -14,7 +14,7 @@ typedef void (^CompletionHandler)();
 @end
 
 #ifdef RCT_NEW_ARCH_ENABLED
-@interface RNBackgroundDownloader () <RNBackgroundDownloaderSpec>
+@interface RNBackgroundDownloader () <NativeRNBackgroundDownloaderSpec>
 
 @end
 #endif
